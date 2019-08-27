@@ -1,5 +1,5 @@
 import argparse
-import pytesseract as pts
+import pytesseract
 import os
 import cv2
 import numpy as np
@@ -79,6 +79,8 @@ class OcrApi():
                 endX = int(endX * rW)
                 endY = int(endY * rH)
                 
+                text = self.make_text_predictions_on_roi(image_copy[startY:endY,startX:endX])
+                print(text)
                 cv2.rectangle(image_copy, (startX, startY), (endX, endY), (0,0,255), 2)
 
             cv2.imshow('Image',image_copy)
@@ -86,6 +88,15 @@ class OcrApi():
 
 
             cv2.waitKey(0)
+
+    def make_text_predictions_on_roi(self,roi) -> str:
+        config = ("-l eng --oem 1 --psm 7")
+        cv2.imshow('roi',roi)
+        cv2.waitKey(0)
+        text = pytesseract.image_to_string(roi, config=config)
+
+        return text
+
 
     def _decode_predictions(self,scores, geometry):
         # grab the number of rows and columns from the scores volume, then
